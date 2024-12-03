@@ -24,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-k9u(4wq5h_tnu1xrq1q01q@gz!(ji65d3niz7)jr$266p1g%)v'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['127.0.0.1', 'backend-knov.onrender.com', 'localhost',]
 
 
 # Application definition
@@ -68,7 +68,6 @@ MIDDLEWARE = ['whitenoise.middleware.WhiteNoiseMiddleware',
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
-    'https://www.sclcm-lcct.com'
 ]
 
 ROOT_URLCONF = 'gacs_sys.urls'
@@ -151,7 +150,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-
 STATIC_URL = 'static/'
 if DEBUG:
     STATICFILES_DIRS = [
@@ -159,9 +157,6 @@ if DEBUG:
     ]
 else:
     STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
@@ -206,7 +201,7 @@ CKEDITOR_CONFIGS = {
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    BASE_DIR / "staticfiles",
 ]
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
