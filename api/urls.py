@@ -41,4 +41,6 @@ urlpatterns = [
     path('api/healthproblem_analytics/', Health_Problem_Analytics.as_view(), name='healthproblem_analytics'),
     path('api/academicproblem_analytics/', Academic_Problem_Analytics.as_view(), name='academicproblem_analytics'),
     path('api/careerproblem_analytics/', Career_Problem_Analytics.as_view(), name='careerproblem_analytics'),
+    path('api/routineinterview_analytics/', RoutineInterview_Analytics.as_view(), name='routineinterview_analytics'),
+    path('api/problem_trends/', ProblemTrendAnalysisView.as_view(), name='problem_trends'),
 ]

@@ -390,23 +390,80 @@ class Family_Problem_Analytics(APIView):
     
 class Friends_Problem_Analytics(APIView):
     def get(self, request):
-        stats = RoutineInterview.objects.values('friends_problem').annotate(count=Count('friends_problem'))
+        grade = request.query_params.get('grade', None)
+        if grade:
+            stats = RoutineInterview.objects.filter(grade=grade).values('friends_problem').annotate(count=Count('friends_problem'))
+        else:
+            stats = RoutineInterview.objects.values('friends_problem').annotate(count=Count('friends_problem'))
         return Response(stats)
 
 class Health_Problem_Analytics(APIView):
     def get(self, request):
-        stats = RoutineInterview.objects.values('health_problem').annotate(count=Count('health_problem'))
+        grade = request.query_params.get('grade', None)
+        if grade:
+            stats = RoutineInterview.objects.filter(grade=grade).values('health_problem').annotate(count=Count('health_problem'))
+        else:
+            stats = RoutineInterview.objects.values('health_problem').annotate(count=Count('health_problem'))
         return Response(stats)
     
 class Academic_Problem_Analytics(APIView):
     def get(self, request):
-        stats = RoutineInterview.objects.values('academic_problem').annotate(count=Count('academic_problem'))
+        grade = request.query_params.get('grade', None)
+        if grade:
+            stats = RoutineInterview.objects.filter(grade=grade).values('academic_problem').annotate(count=Count('academic_problem'))
+        else:
+            stats = RoutineInterview.objects.values('academic_problem').annotate(count=Count('academic_problem'))
         return Response(stats)
     
 class Career_Problem_Analytics(APIView):
     def get(self, request):
-        stats = RoutineInterview.objects.values('career_problem').annotate(count=Count('career_problem'))
+        grade = request.query_params.get('grade', None)
+        if grade:
+            stats = RoutineInterview.objects.filter(grade=grade).values('career_problem').annotate(count=Count('career_problem'))
+        else:
+            stats = RoutineInterview.objects.values('career_problem').annotate(count=Count('career_problem'))
         return Response(stats)
+    
+class RoutineInterview_Analytics(APIView):
+    def get(self, request):
+        # Count non-null entries for each problem field
+        family_problem_count = RoutineInterview.objects.filter(family_problem__isnull=False).count()
+        friends_problem_count = RoutineInterview.objects.filter(friends_problem__isnull=False).count()
+        health_problem_count = RoutineInterview.objects.filter(health_problem__isnull=False).count()
+        academic_problem_count = RoutineInterview.objects.filter(academic_problem__isnull=False).count()
+        career_problem_count = RoutineInterview.objects.filter(career_problem__isnull=False).count()
+
+        # Return the counts as a response
+        return Response({
+            "family_problem_count": family_problem_count,
+            "friends_problem_count": friends_problem_count,
+            "health_problem_count": health_problem_count,
+            "academic_problem_count": academic_problem_count,
+            "career_problem_count": career_problem_count
+        })
+
+class ProblemTrendAnalysisView(APIView):
+    def get(self, request):
+        problem_data = {
+            "family_problem_counts": [],
+            "friends_problem_counts": [],
+            "health_problem_counts": [],
+            "academic_problem_counts": [],
+            "career_problem_counts": [],
+        }
+
+        grades = ["Kinder", "Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Grade 6", "Grade 7", "Grade 8", "Grade 9", "Grade 10", "Grade 11", "Grade 12", "1st Year", "2nd Year", "3rd Year", "4th Year"]
+
+        for grade in grades:
+            problems = RoutineInterview.objects.filter(grade=grade)
+
+            problem_data["family_problem_counts"].append(problems.filter(family_problem=True).count())
+            problem_data["friends_problem_counts"].append(problems.filter(friends_problem=True).count())
+            problem_data["health_problem_counts"].append(problems.filter(health_problem=True).count())
+            problem_data["academic_problem_counts"].append(problems.filter(academic_problem=True).count())
+            problem_data["career_problem_counts"].append(problems.filter(career_problem=True).count())
+
+        return Response(problem_data)
     
 class CareerTrackingView(APIView):
     def get(self, request, student_id):
