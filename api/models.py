@@ -118,7 +118,10 @@ class CareerTracking(models.Model):
     medical_records = models.JSONField(default=list)
     specify = models.CharField(max_length=255, blank=True, null=True)
     academic_status = models.JSONField(default=list)
-    psych_results = models.CharField(max_length=255)
+    hobbies = models.JSONField(default=list, blank=True, null=True)
+    cognitive = models.JSONField(default=list, blank=True, null=True)
+    emotional = models.JSONField(default=list, blank=True, null=True)
+    personality = models.JSONField(default=list, blank=True, null=True)
 
     top_one = models.CharField(max_length=100, blank=True, null=True)
     top_two = models.CharField(max_length=100, blank=True, null=True)
