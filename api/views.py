@@ -19,9 +19,11 @@ from django.db.models import Count, Q
 
 # Create your views here.
 class StudentListView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     def get(self, request):
-        students = IndividualRecordForm.objects.all().values("sr_code", "name")  # or any other field
-        return Response(students)
+        students = IndividualRecordForm.objects.values("sr_code")  # Adjust field name if necessary
+        return Response(list(students))
     
 class RegisterView(APIView):
     def post(self, request):

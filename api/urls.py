@@ -43,4 +43,5 @@ urlpatterns = [
     path('api/careerproblem_analytics/', Career_Problem_Analytics.as_view(), name='careerproblem_analytics'),
     path('api/routineinterview_analytics/', RoutineInterview_Analytics.as_view(), name='routineinterview_analytics'),
     path('api/problem_trends/', ProblemTrendAnalysisView.as_view(), name='problem_trends'),
+    path('api/students/', StudentListView.as_view(), name='student-list'),
 ]

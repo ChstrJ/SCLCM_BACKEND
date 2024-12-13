@@ -62,9 +62,9 @@ class IndividualRecordForm(models.Model):
     motherContactNumber = models.CharField(max_length=255, blank=True, null=True)
     motherEmailAddress = models.CharField(max_length=255, blank=True, null=True)
 
-    parents = models.JSONField(default=list)
+    parents = models.CharField(max_length=255, blank=True, null=True)
 
-    living_with = models.JSONField(default=list)
+    living_with = models.CharField(max_length=255, blank=True, null=True)
     relationship = models.CharField(max_length=255, blank=True, null=True)
 
     club = models.CharField(max_length=500, blank=True, null=True)
@@ -76,21 +76,21 @@ class RoutineInterview(models.Model):
     grade = models.CharField(max_length=100, choices=GRADE_LEVEL)
     date = models.DateField()
 
-    family_problem = models.JSONField(default=list, blank=True, null=True)
+    family_problem = models.CharField(max_length=255, blank=True, null=True)
     family_details = models.TextField(blank=True, null=True)
-    friends_problem = models.JSONField(default=list, blank=True, null=True)
+    friends_problem = models.CharField(max_length=255, blank=True, null=True)
     friends_details = models.TextField(blank=True, null=True)
-    health_problem = models.JSONField(default=list, blank=True, null=True)
+    health_problem = models.CharField(max_length=255, blank=True, null=True)
     health_details = models.TextField(blank=True, null=True)
     
-    academic_problem = models.JSONField(default=list, blank=True, null=True)
+    academic_problem = models.CharField(max_length=255, blank=True, null=True)
     academic_details = models.TextField(blank=True, null=True)
 
-    career_problem = models.JSONField(default=list, blank=True, null=True)
+    career_problem = models.CharField(max_length=255, blank=True, null=True)
     career_details = models.TextField(blank=True, null=True)
 
     remarks = models.TextField(blank=True, null=True)
-    recommendation = models.JSONField(default=list, blank=True, null=True)
+    recommendation = models.CharField(max_length=255, blank=True, null=True)
     other_recommendation = models.CharField(max_length=255, blank=True, null=True)
 
 class CareerTracking(models.Model): 
@@ -109,19 +109,19 @@ class CareerTracking(models.Model):
     computer = models.IntegerField()
     fl = models.IntegerField()
 
-    academic_track = models.JSONField(default=list, blank=True, null=True)
+    academic_track = models.CharField(max_length=255, blank=True, null=True)
     other_track = models.CharField(max_length=255, blank=True, null=True)
-    tech_voc = models.JSONField(default=list, blank=True, null=True)
+    tech_voc = models.CharField(max_length=255, blank=True, null=True)
     other_techvoc = models.CharField(max_length=255, blank=True, null=True)
     preferredCourse = models.CharField(max_length=255, blank=True, null=True)
 
-    medical_records = models.JSONField(default=list)
+    medical_records = models.CharField(max_length=255, blank=True, null=True)
     specify = models.CharField(max_length=255, blank=True, null=True)
-    academic_status = models.JSONField(default=list)
-    hobbies = models.JSONField(default=list, blank=True, null=True)
-    cognitive = models.JSONField(default=list, blank=True, null=True)
-    emotional = models.JSONField(default=list, blank=True, null=True)
-    personality = models.JSONField(default=list, blank=True, null=True)
+    academic_status = models.CharField(max_length=255, blank=True, null=True)
+    hobbies = models.CharField(max_length=255, blank=True, null=True)
+    cognitive = models.CharField(max_length=255, blank=True, null=True)
+    emotional = models.CharField(max_length=255, blank=True, null=True)
+    personality = models.CharField(max_length=255, blank=True, null=True)
 
     top_one = models.CharField(max_length=100, blank=True, null=True)
     top_two = models.CharField(max_length=100, blank=True, null=True)
