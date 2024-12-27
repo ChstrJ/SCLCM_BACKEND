@@ -1,6 +1,8 @@
+from email.utils import parsedate
 from venv import logger
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import JsonResponse
+from django.views import View
 from rest_framework import viewsets, permissions
 from .models import *
 from .serializer import *
@@ -14,8 +16,10 @@ from rest_framework.pagination import PageNumberPagination
 from django.db import connection, transaction
 from django.views.decorators.cache import never_cache
 from django.utils.decorators import method_decorator
-from django.db import close_old_connections
 from django.db.models import Count, Q
+from django.core.files.storage import default_storage
+from django.views.decorators.csrf import csrf_exempt
+from django.core.files.storage import FileSystemStorage
 
 # Create your views here.
 class StudentListView(APIView):
@@ -140,6 +144,29 @@ class LoginView(APIView):
             return Response({'token': token.key, 'role': user_role}, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+        
+def search_student(request):
+    query = request.GET.get('query', '').strip()
+    if query:
+        students = IndividualRecordForm.objects.filter(
+            Q(sr_code__icontains=query) |
+            Q(lastname__icontains=query) |
+            Q(firstname__icontains=query)
+        ).select_related('profile').distinct()
+
+        results = [
+            {
+                'sr_code': student.sr_code,
+                'firstname': student.firstname,
+                'lastname': student.lastname,
+                'year': student.year,
+                'section': student.section
+            }
+            for student in students
+        ]
+
+        return JsonResponse({'results': results}, safe=False)
+    return JsonResponse({'results': []}) 
         
 class RoutineInterviewViewset(BaseViewSet):
     queryset = RoutineInterview.objects.all()
@@ -343,12 +370,9 @@ class AppointmentView(APIView):
         return Response(serializer.data)
     
     def post(self, request):
+        # Ensure sr_code is a valid instance of IndividualRecordForm
         try:
-            # Ensure sr_code is a valid instance of IndividualRecordForm
-            try:
-                student = IndividualRecordForm.objects.get(sr_code=request.data.get('sr_code'))
-            except IndividualRecordForm.DoesNotExist:
-                return Response({'non_field_errors': ['Invalid Individual Record Form reference.']}, status=status.HTTP_400_BAD_REQUEST)
+            student = IndividualRecordForm.objects.get(sr_code=request.data.get('sr_code'))
         except IndividualRecordForm.DoesNotExist:
             return Response({'error': 'Invalid sr_code. No student found.'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -428,12 +452,25 @@ class Career_Problem_Analytics(APIView):
     
 class RoutineInterview_Analytics(APIView):
     def get(self, request):
+        # Get query parameters for time filtering
+        start_date = request.query_params.get("start_date")
+        end_date = request.query_params.get("end_date")
+
+        # Base queryset
+        queryset = RoutineInterview.objects.all()
+
+        # Apply date filtering if parameters are provided
+        if start_date:
+            queryset = queryset.filter(created_at__gte=parsedate(start_date))
+        if end_date:
+            queryset = queryset.filter(created_at__lte=parsedate(end_date))
+
         # Count non-null entries for each problem field
-        family_problem_count = RoutineInterview.objects.filter(family_problem__isnull=False).count()
-        friends_problem_count = RoutineInterview.objects.filter(friends_problem__isnull=False).count()
-        health_problem_count = RoutineInterview.objects.filter(health_problem__isnull=False).count()
-        academic_problem_count = RoutineInterview.objects.filter(academic_problem__isnull=False).count()
-        career_problem_count = RoutineInterview.objects.filter(career_problem__isnull=False).count()
+        family_problem_count = queryset.filter(family_problem__isnull=False).count()
+        friends_problem_count = queryset.filter(friends_problem__isnull=False).count()
+        health_problem_count = queryset.filter(health_problem__isnull=False).count()
+        academic_problem_count = queryset.filter(academic_problem__isnull=False).count()
+        career_problem_count = queryset.filter(career_problem__isnull=False).count()
 
         # Return the counts as a response
         return Response({
@@ -475,3 +512,24 @@ class CareerTrackingView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except CareerTracking.DoesNotExist:
             return Response({"error": "Career tracking not found"}, status=status.HTTP_404_NOT_FOUND)   
+        
+class FileUploadView(View):
+    @csrf_exempt
+    def upload_document(request):
+        if request.method == 'POST' and request.FILES['upload']:
+            document = request.FILES['upload']
+            allowed_extensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx']
+
+            # Validate file type
+            if document.name.split('.')[-1].lower() not in allowed_extensions:
+                return JsonResponse({'error': 'Unsupported file type'}, status=400)
+
+            # Save file
+            fs = FileSystemStorage()
+            filename = fs.save(document.name, document)
+            file_url = fs.url(filename)
+
+            # Respond with the file URL
+            return JsonResponse({'url': file_url})
+
+        return JsonResponse({'error': 'Invalid request'}, status=400)

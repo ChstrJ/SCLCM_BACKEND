@@ -183,6 +183,23 @@ LOGGING = {
     },
 }
 
+
+# CKEditor configurations
+CKEDITOR_UPLOAD_PATH = "uploads/"  # Path where uploaded files will be stored
+CKEDITOR_ALLOW_NONIMAGE_FILES = True  # Allow non-image files like PDFs, etc.
+CKEDITOR_IMAGE_BACKEND = "pillow"  # Backend for image processing
+
+# Optional: Restrict upload file types
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 300,
+        'width': '100%',
+        'filebrowserUploadUrl': '/ckeditor/upload/',  # URL for handling uploads
+        'filebrowserUploadMethod': 'form',
+    },
+}
+
 CKEDITOR_CONFIGS = {
     'default': {
         'toolbar': 'Full',
@@ -205,10 +222,12 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / "staticfiles",
 ]
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 26214400
 
 customColorPalette = [
         {
