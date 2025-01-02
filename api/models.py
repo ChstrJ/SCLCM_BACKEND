@@ -569,6 +569,8 @@ class Appointment(models.Model):
     grade = models.CharField(max_length=50)
     section = models.CharField(max_length=50)
     date = models.DateField()
+    start = models.DateField()
+    end = models.DateField()
     time = models.TimeField(default=time(9, 0))
     purpose = models.CharField(max_length=50, choices=PURPOSE_CHOICES)
     other_purpose = models.CharField(max_length=255, blank=True, null=True)
