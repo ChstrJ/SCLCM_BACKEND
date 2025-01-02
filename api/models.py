@@ -573,6 +573,7 @@ class Appointment(models.Model):
     end = models.DateField(blank=True, null=True)
     time = models.TimeField(default=time(9, 0))
     purpose = models.CharField(max_length=50, choices=PURPOSE_CHOICES)
+    title = models.CharField(max_length=255, blank=True, null=True)
     other_purpose = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
