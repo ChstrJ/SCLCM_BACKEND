@@ -20,6 +20,7 @@ from django.db.models import Count, Q
 from django.core.files.storage import default_storage
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import FileSystemStorage
+from datetime import datetime
 
 # Create your views here.
 class StudentListView(APIView):
@@ -408,47 +409,112 @@ class AppointmentView(APIView):
 class Family_Problem_Analytics(APIView):
     def get(self, request):
         grade = request.query_params.get('grade', None)
+        start_date = request.query_params.get('start_date', None)
+        end_date = request.query_params.get('end_date', None)
+
+        queryset = RoutineInterview.objects.all()
+
         if grade:
-            stats = RoutineInterview.objects.filter(grade=grade).values('family_problem').annotate(count=Count('family_problem'))
-        else:
-            stats = RoutineInterview.objects.values('family_problem').annotate(count=Count('family_problem'))
+            queryset = queryset.filter(grade=grade)
+
+        if start_date and end_date:
+            try:
+                start_date = datetime.strptime(start_date, "%Y-%m-%d")
+                end_date = datetime.strptime(end_date, "%Y-%m-%d")
+                queryset = queryset.filter(date__range=(start_date, end_date))
+            except ValueError:
+                return Response({"error": "Invalid date format. Use YYYY-MM-DD."}, status=400)
+
+        stats = queryset.values('family_problem').annotate(count=Count('family_problem'))
         return Response(stats)
     
 class Friends_Problem_Analytics(APIView):
     def get(self, request):
         grade = request.query_params.get('grade', None)
+        start_date = request.query_params.get('start_date', None)
+        end_date = request.query_params.get('end_date', None)
+
+        queryset = RoutineInterview.objects.all()
+
         if grade:
-            stats = RoutineInterview.objects.filter(grade=grade).values('friends_problem').annotate(count=Count('friends_problem'))
-        else:
-            stats = RoutineInterview.objects.values('friends_problem').annotate(count=Count('friends_problem'))
-        return Response(stats)
+            queryset = queryset.filter(grade=grade)
+
+        if start_date and end_date:
+            try:
+                start_date = datetime.strptime(start_date, "%Y-%m-%d")
+                end_date = datetime.strptime(end_date, "%Y-%m-%d")
+                queryset = queryset.filter(date__range=(start_date, end_date))
+            except ValueError:
+                return Response({"error": "Invalid date format. Use YYYY-MM-DD"}, status=400)
+            
+            stats = queryset.values('friends_problem').annotate(count=Count('friends_problem'))
+            return Response(stats)
 
 class Health_Problem_Analytics(APIView):
     def get(self, request):
         grade = request.query_params.get('grade', None)
+        start_date = request.query_params.get('start_date', None)
+        end_date = request.query_params.get('end_date', None)
+
+        queryset = RoutineInterview.objects.all()
+
         if grade:
-            stats = RoutineInterview.objects.filter(grade=grade).values('health_problem').annotate(count=Count('health_problem'))
-        else:
-            stats = RoutineInterview.objects.values('health_problem').annotate(count=Count('health_problem'))
-        return Response(stats)
+            queryset = queryset.filter(grade=grade)
+
+        if start_date and end_date:
+            try:
+                start_date = datetime.strptime(start_date, "%Y-%m-%d")
+                end_date = datetime.strptime(end_date, "%Y-%m-%d")
+                queryset = queryset.filter(date__range=(start_date, end_date))
+            except ValueError:
+                return Response({"error": "Invalid date format. Use YYYY-MM-DD"}, status=400)
+            
+            stats = queryset.values('health_problem').annotate(count=Count('health_problem'))
+            return Response(stats)
     
 class Academic_Problem_Analytics(APIView):
     def get(self, request):
         grade = request.query_params.get('grade', None)
+        start_date = request.query_params.get('start_date', None)
+        end_date = request.query_params.get('end_date', None)
+
+        queryset = RoutineInterview.objects.all()
+
         if grade:
-            stats = RoutineInterview.objects.filter(grade=grade).values('academic_problem').annotate(count=Count('academic_problem'))
-        else:
-            stats = RoutineInterview.objects.values('academic_problem').annotate(count=Count('academic_problem'))
-        return Response(stats)
+            queryset = queryset.filter(grade=grade)
+
+        if start_date and end_date:
+            try:
+                start_date = datetime.strptime(start_date, "%Y-%m-%d")
+                end_date = datetime.strptime(end_date, "%Y-%m-%d")
+                queryset = queryset.filter(date__range=(start_date, end_date))
+            except ValueError:
+                return Response({"error": "Invalid date format. Use YYYY-MM-DD"}, status=400)
+            
+            stats = queryset.values('academic_problem').annotate(count=Count('academic_problem'))
+            return Response(stats)
     
 class Career_Problem_Analytics(APIView):
-    def get(self, request):
+   def get(self, request):
         grade = request.query_params.get('grade', None)
+        start_date = request.query_params.get('start_date', None)
+        end_date = request.query_params.get('end_date', None)
+
+        queryset = RoutineInterview.objects.all()
+
         if grade:
-            stats = RoutineInterview.objects.filter(grade=grade).values('career_problem').annotate(count=Count('career_problem'))
-        else:
-            stats = RoutineInterview.objects.values('career_problem').annotate(count=Count('career_problem'))
-        return Response(stats)
+            queryset = queryset.filter(grade=grade)
+
+        if start_date and end_date:
+            try:
+                start_date = datetime.strptime(start_date, "%Y-%m-%d")
+                end_date = datetime.strptime(end_date, "%Y-%m-%d")
+                queryset = queryset.filter(date__range=(start_date, end_date))
+            except ValueError:
+                return Response({"error": "Invalid date format. Use YYYY-MM-DD"}, status=400)
+            
+            stats = queryset.values('career_problem').annotate(count=Count('career_problem'))
+            return Response(stats)
     
 class RoutineInterview_Analytics(APIView):
     def get(self, request):
@@ -458,7 +524,7 @@ class RoutineInterview_Analytics(APIView):
 
         # Base queryset
         queryset = RoutineInterview.objects.all()
-
+                            
         # Apply date filtering if parameters are provided
         if start_date:
             queryset = queryset.filter(created_at__gte=parsedate(start_date))
