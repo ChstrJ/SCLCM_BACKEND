@@ -218,15 +218,27 @@ CKEDITOR_CONFIGS = {
 
 
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Static files settings
 STATIC_URL = '/static/'
+
+# STATICFILES_DIRS is only for development, remove it in production
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+    BASE_DIR / "static",  # Ensure this directory exists
+] if os.getenv('DJANGO_DEBUG', 'True') == 'True' else []
+
+# STATIC_ROOT is where `collectstatic` will gather all static files in production
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Media files settings
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# CKEditor uploads
 CKEDITOR_UPLOAD_PATH = "uploads/"
 
+# Maximum upload size (25MB)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 26214400
 
 customColorPalette = [
