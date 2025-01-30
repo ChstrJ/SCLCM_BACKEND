@@ -47,7 +47,7 @@ urlpatterns = [
     path('api/problem_trends/', ProblemTrendAnalysisView.as_view(), name='problem_trends'),
     path('api/students/', StudentListView.as_view(), name='student-list'),
     path('api/search-student/', search_student, name='search_student'),
-    path('upload/', FileUploadView.as_view(), name='file-upload'),
+    path('api/upload/', FileUploadView.as_view(), name='file-upload'),
 ]
 
 

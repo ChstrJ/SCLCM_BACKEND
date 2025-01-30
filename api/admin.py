@@ -17,5 +17,8 @@ admin.site.register(Grade_Seven)
 admin.site.register(Grade_Eight)
 admin.site.register(Grade_Nine)
 admin.site.register(Grade_Ten)
-admin.site.register(Resource)
 admin.site.register(Appointment)
+
+@admin.register(Resource)
+class ResourceAdmin(admin.ModelAdmin):
+    list_display = ['title']

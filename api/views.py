@@ -21,6 +21,7 @@ from django.core.files.storage import default_storage
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import FileSystemStorage
 from datetime import datetime
+import os
 
 # Create your views here.
 class StudentListView(APIView):
@@ -580,22 +581,25 @@ class CareerTrackingView(APIView):
             return Response({"error": "Career tracking not found"}, status=status.HTTP_404_NOT_FOUND)   
         
 class FileUploadView(View):
-    @csrf_exempt
-    def upload_document(request):
-        if request.method == 'POST' and request.FILES['upload']:
-            document = request.FILES['upload']
-            allowed_extensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx']
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
 
-            # Validate file type
-            if document.name.split('.')[-1].lower() not in allowed_extensions:
-                return JsonResponse({'error': 'Unsupported file type'}, status=400)
+    def post(self, request):
+        if 'upload' not in request.FILES:
+            return JsonResponse({'error': 'No file uploaded'}, status=400)
 
-            # Save file
-            fs = FileSystemStorage()
-            filename = fs.save(document.name, document)
-            file_url = fs.url(filename)
+        document = request.FILES['upload']
+        allowed_extensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx']
 
-            # Respond with the file URL
-            return JsonResponse({'url': file_url})
+        # Validate file type
+        file_extension = os.path.splitext(document.name)[-1].lower().strip('.')
+        if file_extension not in allowed_extensions:
+            return JsonResponse({'error': 'Unsupported file type'}, status=400)
 
-        return JsonResponse({'error': 'Invalid request'}, status=400)
+        # Save file
+        fs = FileSystemStorage()
+        filename = fs.save(document.name, document)
+        file_url = fs.url(filename)
+
+        return JsonResponse({'url': file_url})

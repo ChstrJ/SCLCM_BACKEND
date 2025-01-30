@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
-from ckeditor.fields import RichTextField
+from ckeditor_uploader.fields import RichTextUploadingField
 from datetime import time
 
 # Create your models here.
@@ -544,7 +544,7 @@ class Fourth_Year(models.Model):
 
 class Resource(models.Model):
     title = models.CharField(max_length=200)
-    content = RichTextField(blank=True, null=True)
+    content = RichTextUploadingField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     author = models.ForeignKey(get_user_model(), related_name='resource', on_delete=models.CASCADE, default=1)
