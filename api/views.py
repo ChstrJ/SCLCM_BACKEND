@@ -3,9 +3,11 @@ from pathlib import Path
 from venv import logger
 from django.conf import settings
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import FileResponse, JsonResponse
 from django.views import View
 from rest_framework import viewsets, permissions
+
+from api.utils import validate_user
 from .models import *
 from .serializer import *
 from rest_framework.response import Response
@@ -608,9 +610,12 @@ class FileUploadView(View):
 
 
 class StorageView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        allowed_extensions = ['.pdf', '.doc', '.docx', '.xls', '.xlsx']
+        validate_user(request)
+    
+        allowed_extensions = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.png']
 
         file = request.FILES.get('file')
 
@@ -626,6 +631,8 @@ class StorageView(APIView):
             return JsonResponse({'error': 'Unsupported file type'}, status=400)
 
         try:
+            if fs.exists(file_name):
+                fs.delete(file_name)
             fs.save(file_name, file)
         except Exception as e:
             print('Error occurred', e)
@@ -636,8 +643,20 @@ class StorageView(APIView):
 
 class ListFilesView(APIView):
     def get(self, request):
+        validate_user(request)
 
         files = os.listdir(settings.MEDIA_ROOT)
         file_urls = [f"{settings.MEDIA_URL}{file}" for file in files]
 
         return Response({'files': file_urls})
+
+class DownloadFileView(APIView):
+    def get(self, request, filename):
+        validate_user(request)
+
+        try:
+            file_path = os.path.join(settings.MEDIA_ROOT, filename)
+            return FileResponse(open(file_path, 'rb'), as_attachment=True)
+        except FileNotFoundError as e:
+            print('Error: ', e)
+            return JsonResponse({'error' : 'File not found.'})

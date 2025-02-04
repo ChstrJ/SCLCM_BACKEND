@@ -50,6 +50,7 @@ urlpatterns = [
     path('api/upload/', FileUploadView.as_view(), name='file-upload'),
     path('api/storage/upload/', StorageView.as_view(), name='storage-file-upload'),
     path('api/storage/files/', ListFilesView.as_view(), name='storage-list-files'),
+    path('api/storage/download/<str:filename>/', DownloadFileView.as_view(), name='storage-download-file'),
 ]
 
 
