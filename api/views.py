@@ -1,5 +1,7 @@
 from email.utils import parsedate
+from pathlib import Path
 from venv import logger
+from django.conf import settings
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views import View
@@ -603,3 +605,39 @@ class FileUploadView(View):
         file_url = fs.url(filename)
 
         return JsonResponse({'url': file_url})
+
+
+class StorageView(APIView):
+
+    def post(self, request):
+        allowed_extensions = ['.pdf', '.doc', '.docx', '.xls', '.xlsx']
+
+        file = request.FILES.get('file')
+
+        if not file or not request.FILES:
+            return JsonResponse({'error': 'No file uploaded'}, status=400)
+
+        fs = FileSystemStorage()
+        file_name = file.name.replace(' ', '_')
+
+        file_extension = Path(file_name).suffix
+
+        if file_extension not in allowed_extensions:
+            return JsonResponse({'error': 'Unsupported file type'}, status=400)
+
+        try:
+            fs.save(file_name, file)
+        except Exception as e:
+            print('Error occurred', e)
+            return JsonResponse({'success': False})
+
+        return JsonResponse({'success': True})
+
+
+class ListFilesView(APIView):
+    def get(self, request):
+
+        files = os.listdir(settings.MEDIA_ROOT)
+        file_urls = [f"{settings.MEDIA_URL}{file}" for file in files]
+
+        return Response({'files': file_urls})
